@@ -1,5 +1,7 @@
 {
-  "name": "Scaffold-ETH 2 DApp",
-  "description": "A DApp built with Scaffold-ETH",
-  "iconPath": "logo.svg"
+  "name": "25 Clams",
+  "short_name": "25 Clams",
+  "description": "Deal or No Deal on Base — pick your clam and play for a CLAWD jackpot",
+  "iconPath": "icon.svg",
+  "start_url": "/"
 }

@@ -14,6 +14,7 @@ const nextConfig: NextConfig & Record<string, any> = {
   eslint: {
     ignoreDuringBuilds: process.env.NEXT_PUBLIC_IGNORE_BUILD_ERROR === "true",
   },
+  turbopack: {},
   webpack: config => {
     config.resolve.fallback = { fs: false, net: false, tls: false };
     config.externals.push("pino-pretty", "lokijs", "encoding");

@@ -1,83 +1,52 @@
-# 🏗 Scaffold-ETH 2
+# 25 Clams
 
-<h4 align="center">
-  <a href="https://docs.scaffoldeth.io">Documentation</a> |
-  <a href="https://scaffoldeth.io">Website</a>
-</h4>
+A fully onchain Deal or No Deal-style game on Base, powered by CLAWD tokens and Chainlink VRF.
 
-🧪 An open-source, up-to-date toolkit for building decentralized applications (dapps) on the Ethereum blockchain. It's designed to make it easier for developers to create and deploy smart contracts and build user interfaces that interact with those contracts.
+## How It Works
 
-> [!NOTE]
-> 🤖 Scaffold-ETH 2 is AI-ready! It has everything agents need to build on Ethereum. Check `.agents/`, `.claude/`, `.opencode` or `.cursor/` for more info.
+25 clams sit on the board. Each hides a CLAWD value. Before the game starts, pick the clam you think holds the most — that's yours to keep if you never deal. Play 8 rounds, eliminating clams and hearing the banker's offers. Deal when the price is right, or hold out for your clam's true value.
 
-⚙️ Built using NextJS, RainbowKit, Foundry, Wagmi, Viem, and Typescript.
+## Contracts (Base Mainnet)
 
-- ✅ **Contract Hot Reload**: Your frontend auto-adapts to your smart contract as you edit it.
-- 🪝 **[Custom hooks](https://docs.scaffoldeth.io/hooks/)**: Collection of React hooks wrapper around [wagmi](https://wagmi.sh/) to simplify interactions with smart contracts with typescript autocompletion.
-- 🧱 [**Components**](https://docs.scaffoldeth.io/components/): Collection of common web3 components to quickly build your frontend.
-- 🔥 **Burner Wallet & Local Faucet**: Quickly test your application with a burner wallet and local faucet.
-- 🔐 **Integration with Wallet Providers**: Connect to different wallet providers and interact with the Ethereum network.
+| Contract | Address | Basescan |
+|---|---|---|
+| ClamsPool (Investor Vault) | `0x94a312581269433d52F83c8FFd34097370627E2a` | [View](https://basescan.org/address/0x94a312581269433d52F83c8FFd34097370627E2a) |
+| ClamsGame (Game Logic) | `0x5E91944DB001C70435E2425DF14430829d4fBc06` | [View](https://basescan.org/address/0x5E91944DB001C70435E2425DF14430829d4fBc06) |
+| CLAWD Token | `0x9f86dB9fc6f7c9408e8Fda3Ff8ce4e78ac7a6b07` | [View](https://basescan.org/address/0x9f86dB9fc6f7c9408e8Fda3Ff8ce4e78ac7a6b07) |
 
-![Debug Contracts tab](https://github.com/scaffold-eth/scaffold-eth-2/assets/55535804/b237af0c-5027-4849-a5c1-2e31495cccb1)
+## Live App
 
-## Requirements
+Deploy via IPFS — see `DEPLOYMENT.md` after first BGIPFS upload.
 
-Before you begin, you need to install the following tools:
+## Architecture
 
-- [Node (>= v20.18.3)](https://nodejs.org/en/download/)
-- Yarn ([v1](https://classic.yarnpkg.com/en/docs/install/) or [v2+](https://yarnpkg.com/getting-started/install))
-- [Git](https://git-scm.com/downloads)
+- **ClamsPool** — ERC4626-style CLAWD investor vault. Investors deposit CLAWD, receive proportional shares. Pool earns the house edge over time. Locked during active games.
+- **ClamsGame** — Core game contract. One active game at a time. Chainlink VRF V2.5 shuffles the 25 clam values at game start via Fisher-Yates algorithm.
 
-## Quickstart
+## Entry Fee and Fee Split
 
-To get started with Scaffold-ETH 2, follow the steps below:
+- Entry fee: 1,000 CLAWD
+- 2% burned (deflationary)
+- 2% to CLAWD treasury
+- 96% enters the prize pool
 
-1. Install dependencies if it was skipped in CLI:
+## Prerequisites Before First Game
 
-```
-cd my-dapp-example
+1. **VRF Subscription**: Create a VRF subscription at vrf.chain.link, fund it with LINK, add `ClamsGame` as consumer. The current deploy uses `subscriptionId = 0` (placeholder). Redeploy with the real subscription ID.
+2. **Pool Seeding**: Deposit CLAWD into `ClamsPool` to backstop the jackpot (minimum 5,000 CLAWD for the smallest jackpot tier).
+
+## Local Development
+
+```bash
 yarn install
+yarn chain          # local anvil fork
+yarn deploy         # deploy to local fork
+yarn start          # frontend at localhost:3000
 ```
 
-2. Run a local network in the first terminal:
+## Tech Stack
 
-```
-yarn chain
-```
-
-This command starts a local Ethereum network using Foundry. The network runs on your local machine and can be used for testing and development. You can customize the network configuration in `packages/foundry/foundry.toml`.
-
-3. On a second terminal, deploy the test contract:
-
-```
-yarn deploy
-```
-
-This command deploys a test smart contract to the local network. The contract is located in `packages/foundry/contracts` and can be modified to suit your needs. The `yarn deploy` command uses the deploy script located in `packages/foundry/script` to deploy the contract to the network. You can also customize the deploy script.
-
-4. On a third terminal, start your NextJS app:
-
-```
-yarn start
-```
-
-Visit your app on: `http://localhost:3000`. You can interact with your smart contract using the `Debug Contracts` page. You can tweak the app config in `packages/nextjs/scaffold.config.ts`.
-
-Run smart contract test with `yarn foundry:test`
-
-- Edit your smart contracts in `packages/foundry/contracts`
-- Edit your frontend homepage at `packages/nextjs/app/page.tsx`. For guidance on [routing](https://nextjs.org/docs/app/building-your-application/routing/defining-routes) and configuring [pages/layouts](https://nextjs.org/docs/app/building-your-application/routing/pages-and-layouts) checkout the Next.js documentation.
-- Edit your deployment scripts in `packages/foundry/script`
-
-
-## Documentation
-
-Visit our [docs](https://docs.scaffoldeth.io) to learn how to start building with Scaffold-ETH 2.
-
-To know more about its features, check out our [website](https://scaffoldeth.io).
-
-## Contributing to Scaffold-ETH 2
-
-We welcome contributions to Scaffold-ETH 2!
-
-Please see [CONTRIBUTING.MD](https://github.com/scaffold-eth/scaffold-eth-2/blob/main/CONTRIBUTING.md) for more information and guidelines for contributing to Scaffold-ETH 2.
+- Scaffold-ETH 2 — SE2 monorepo with Foundry and Next.js
+- Chainlink VRF V2.5 — verifiable randomness on Base
+- BGIPFS — decentralized frontend hosting
+- CLAWD — native game token on Base
